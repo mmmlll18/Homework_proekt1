@@ -1,0 +1,56 @@
+!pip install nest_asyncio
+import nest_asyncio
+nest_asyncio.apply()
+from telegram import Update
+from telegram.ext import Application, CommandHandler, MessageHandler, filters, ContextTypes
+
+
+
+
+# Словарь с гороскопами для каждого знака зодиака
+horoscopes = {
+    'овен': 'Больше терпения. Пробуй медитировать почаще. В момент порыва выдыхай, давай себе и другим больше времени.',
+    'телец': 'Меньше ленитесь. Думаю, сегодня отличный день, чтобы сделать то, что давно откладывал. Лень - это следствие затрата энергии на свои мысли, а не на действия, так что возьми себя в руки сегодня и отложи "время на подумать" на другой день, а сегодня трать силы на работу и свершения. https://www.5-tv.ru/news/350075/kakoj-vyfrukt-poznaku-zodiaka-21e2/',
+    'близнецы': 'Подймай о других. Твои действия имеют последствия. https://www.5-tv.ru/news/350075/kakoj-vyfrukt-poznaku-zodiaka-21e2/',
+    'рак': 'Меньше эмоций. Если ты можешь повлиять-влияй, а если нет, то оно того не стоит. https://www.5-tv.ru/news/350075/kakoj-vyfrukt-poznaku-zodiaka-21e2/',
+    'лев': 'Убери эгоистичность. Сегодня работай на пользу другим. https://www.5-tv.ru/news/350075/kakoj-vyfrukt-poznaku-zodiaka-21e2/',
+    'дева': 'Хватит душнить. Мир зануд не любит... Упрощай, если можно упростить. https://www.5-tv.ru/news/350075/kakoj-vyfrukt-poznaku-zodiaka-21e2/',
+    'весы': 'Если принял решение, следуй ему, а если не принял, так прими уже. https://www.5-tv.ru/news/350075/kakoj-vyfrukt-poznaku-zodiaka-21e2/',
+    'скорпион': 'Выдохни. Закрой глаза и отключи мозг хотя бы на минуту. https://www.5-tv.ru/news/350075/kakoj-vyfrukt-poznaku-zodiaka-21e2/',
+    'стрелец': 'Прими ответственность, это по взрослому! https://www.5-tv.ru/news/350075/kakoj-vyfrukt-poznaku-zodiaka-21e2/',
+    'козерог': 'Больше доверяй людям, не все думают корыстно. https://www.5-tv.ru/news/350075/kakoj-vyfrukt-poznaku-zodiaka-21e2/',
+    'водолей': 'Буть снисходителен, ты тоже совершаешь ошибки и они делают тебя тобой, остальные такие же простые люди, как и ты. https://www.5-tv.ru/news/350075/kakoj-vyfrukt-poznaku-zodiaka-21e2/',
+    'рыбы': 'Не драматизируй. Посмотри под другим углом на это, возможно, все не так страшно. https://www.5-tv.ru/news/350075/kakoj-vyfrukt-poznaku-zodiaka-21e2/'
+}
+
+# Команда /start
+async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    await update.message.reply_text('Прив! Напишите /horoscope, чтобы получить совет от звезд))')
+
+# Команда /horoscope
+async def horoscope(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    zodiac_signs = '\n'.join(horoscopes.keys())
+    await update.message.reply_text(f'Выбери ваш знак зодиака:\n\n{zodiac_signs}')
+
+# Обработчик текста
+async def choose_zodiac(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    zodiac_sign = update.message.text.lower()
+    if zodiac_sign in horoscopes:
+        await update.message.reply_text(horoscopes[zodiac_sign])
+    else:
+        await update.message.reply_text('Пожалуйста, напиши правильно.')
+
+def main():
+    # Замените 'YOUR_TOKEN' на токен вашего бота
+    application = Application.builder().token("7501043453:AAH-bg9TcY0D0wCGjRbjwo_RmIR-R2WTtb8").build()
+
+    # Обработчики команд
+    application.add_handler(CommandHandler("start", start))
+    application.add_handler(CommandHandler("horoscope", horoscope))
+    application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, choose_zodiac))
+    # Запуск бота
+    application.run_polling()
+
+
+if __name__ == '__main__':
+    main()
